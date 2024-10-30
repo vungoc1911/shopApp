@@ -14,9 +14,11 @@ spring:
     properties:
       hibernate:
         bytecode:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
+

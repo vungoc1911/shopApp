@@ -4,10 +4,7 @@ import ch.qos.logback.core.util.StringUtil;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
@@ -22,7 +19,7 @@ import java.util.UUID;
 @RequestMapping("api/v1/products")
 public class ProductController {
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createProduct (@RequestPart("file") List<MultipartFile> files) throws IOException {
+    public ResponseEntity<?> createProduct (@RequestParam("file") List<MultipartFile> files) throws IOException {
         String a = storeFile(files);
         return ResponseEntity.ok("ád");
     }
