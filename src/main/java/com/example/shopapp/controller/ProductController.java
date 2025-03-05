@@ -32,6 +32,7 @@ public class ProductController {
             if (!Files.exists(uploadDỉr)) {
                 Files.createDirectories(uploadDỉr);
             }
+            // Lấy đường dẫn đầy đủ file
             java.nio.file.Path destination = Paths.get(uploadDỉr.toString(), uniqueFilename);
             Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
         }
