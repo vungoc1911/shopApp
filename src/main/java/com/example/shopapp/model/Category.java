@@ -1,4 +1,4 @@
-package com.example.shopapp.Model;
+package com.example.shopapp.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,6 +16,6 @@ public class Category {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 }

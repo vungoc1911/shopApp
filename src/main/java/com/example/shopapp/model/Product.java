@@ -1,9 +1,7 @@
-package com.example.shopapp.Model;
+package com.example.shopapp.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Table(name = "products")
 @Data
@@ -17,8 +15,10 @@ public class Product extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false, length = 350)
     private String name;
     private float price;
+    @Column(name = "thumbnail", length = 300)
     private String thumbnail;
     private String description;
 

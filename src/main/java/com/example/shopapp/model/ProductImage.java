@@ -1,4 +1,4 @@
-package com.example.shopapp.Model;
+package com.example.shopapp.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,6 +18,6 @@ public class ProductImage {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(name = "image_uri")
+    @Column(name = "image_uri", length = 300)
     private String imageUri;
 }

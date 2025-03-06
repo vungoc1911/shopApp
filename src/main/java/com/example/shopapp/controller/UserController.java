@@ -1,7 +1,7 @@
 package com.example.shopapp.controller;
 
-import com.example.shopapp.Dto.UserDto;
-import com.example.shopapp.Dto.UserLoginDto;
+import com.example.shopapp.dto.UserDto;
+import com.example.shopapp.dto.UserLoginDto;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

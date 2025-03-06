@@ -1,4 +1,4 @@
-package com.example.shopapp.Model;
+package com.example.shopapp.model;
 
 public class OrderStatus {
     public static final String PENDING = "pending";
