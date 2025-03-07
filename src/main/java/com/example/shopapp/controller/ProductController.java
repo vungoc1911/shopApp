@@ -1,6 +1,14 @@
 package com.example.shopapp.controller;
 
 import ch.qos.logback.core.util.StringUtil;
+import com.example.shopapp.dto.ProductDTO;
+import com.example.shopapp.model.Product;
+import com.example.shopapp.response.ResponseObject;
+import com.example.shopapp.services.product.IProductService;
+import com.example.shopapp.services.product.ProductService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -17,11 +25,20 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/products")
+@RequiredArgsConstructor
 public class ProductController {
+
+    private final IProductService productService;
+
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createProduct (@RequestParam("file") List<MultipartFile> files) throws IOException {
-        String a = storeFile(files);
-        return ResponseEntity.ok("ád");
+    public ResponseEntity<?> createProduct (@Valid @RequestBody ProductDTO productDTO) throws IOException {
+        Product newProduct = productService.createProduct(productDTO);
+        return ResponseEntity.ok(
+                ResponseObject.builder()
+                        .message("Create new product successfully")
+                        .status(HttpStatus.CREATED)
+                        .data(newProduct)
+                        .build());
     }
 
     private String storeFile(List<MultipartFile> files) throws IOException {

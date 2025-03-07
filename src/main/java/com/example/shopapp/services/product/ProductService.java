@@ -1,15 +1,19 @@
 package com.example.shopapp.services.product;
 
 import com.example.shopapp.dto.ProductDTO;
+import com.example.shopapp.dto.ProductImageDTO;
+import com.example.shopapp.model.Category;
 import com.example.shopapp.model.Product;
+import com.example.shopapp.model.ProductImage;
 import com.example.shopapp.repositories.CategoryRepository;
 import com.example.shopapp.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.Page;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.DateTimeException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,33 +24,52 @@ public class ProductService implements IProductService {
 
     @Override
     public Product createProduct(ProductDTO productDTO) throws Exception {
-        categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(
+        Category existingCategory =  categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(
                 () -> new DateTimeException("Category not found"));
-        return null;
+        Product newProduct = Product.builder()
+                .name(productDTO.getName())
+                .price(productDTO.getPrice())
+                .thumbnail(productDTO.getThumbnail())
+                .description(productDTO.getDescription())
+                .category(existingCategory)
+                .build();
+        return productRepository.save(newProduct);
     }
 
     @Override
     public Product getProductById(long id) throws Exception {
-        return null;
+        return productRepository.findById(id).orElseThrow(() -> new DateTimeException("Product not found"));
     }
 
     @Override
-    public Page<Product> getAllProducts(String keyword, Long categoryId, PageRequest pageRequest) {
-        return null;
+    public Page<Product> getAllProducts(PageRequest pageRequest) {
+        return productRepository.findAll(pageRequest);
     }
 
     @Override
     public Product updateProduct(long id, ProductDTO productDTO) throws Exception {
-        return null;
+        Product product = productRepository.findById(id).orElseThrow(() -> new DateTimeException("Product not found"));
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setThumbnail(productDTO.getThumbnail());
+        product.setDescription(productDTO.getDescription());
+
+        return productRepository.save(product);
     }
 
     @Override
     public void deleteProduct(long id) {
-
+        Optional<Product> product = productRepository.findById(id);
+        product.ifPresent(productRepository::delete);
     }
 
     @Override
     public boolean existsByName(String name) {
-        return false;
+        return productRepository.existsByName(name);
+    }
+
+    @Override
+    public ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception {
+        return null;
     }
 }
