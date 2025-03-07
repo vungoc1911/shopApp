@@ -18,11 +18,12 @@ public class UserDto  {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
     private String address;
+    private String email;
     @NotBlank(message = "password is required")
     private String password;
     private Date DateOfBirth;
-    private int facebookAccountId;
-    private int googleAccountId;
+    private String facebookAccountId;
+    private String googleAccountId;
     private Long roleId;
     private String retypePassword;
 }
