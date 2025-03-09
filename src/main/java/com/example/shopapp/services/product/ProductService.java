@@ -2,11 +2,15 @@ package com.example.shopapp.services.product;
 
 import com.example.shopapp.dto.ProductDTO;
 import com.example.shopapp.dto.ProductImageDTO;
+import com.example.shopapp.exception.DataNotFoundException;
+import com.example.shopapp.exception.InvalidParamException;
 import com.example.shopapp.model.Category;
 import com.example.shopapp.model.Product;
 import com.example.shopapp.model.ProductImage;
 import com.example.shopapp.repositories.CategoryRepository;
+import com.example.shopapp.repositories.ProductImageRepository;
 import com.example.shopapp.repositories.ProductRepository;
+import com.example.shopapp.response.product.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +25,7 @@ public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductImageRepository productImageRepository;
 
     @Override
     public Product createProduct(ProductDTO productDTO) throws Exception {
@@ -42,8 +47,10 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<Product> getAllProducts(PageRequest pageRequest) {
-        return productRepository.findAll(pageRequest);
+    public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
+        return productRepository.findAll(pageRequest)
+                .map(ProductResponse::fromProduct);
+
     }
 
     @Override
@@ -70,6 +77,17 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception {
-        return null;
+        Product existingProduct = productRepository.findById(productId).orElseThrow(
+                () -> new DataNotFoundException("Product not found"));
+
+        ProductImage productImage = ProductImage.builder()
+                .product(existingProduct)
+                .imageUri(productImageDTO.getImageUrl())
+                .build();
+
+        if (productImageRepository.findByProductId(productId).size() >= 5) {
+            throw new InvalidParamException("Number of images must be less than 5!");
+        }
+        return productImageRepository.save(productImage);
     }
 }

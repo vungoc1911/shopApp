@@ -9,7 +9,10 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Entity
 public class ProductImage {
+    public static final int MAXIMUM_IMAGES_PER_PRODUCT = 6;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
