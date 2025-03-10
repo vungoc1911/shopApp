@@ -16,6 +16,8 @@ import java.time.LocalDate;
 @Setter
 public class OrderDTO {
 
+    private Long id;
+
     @JsonProperty("user_id")
     private Long userId;
 
