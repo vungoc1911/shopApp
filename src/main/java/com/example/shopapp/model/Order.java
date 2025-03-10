@@ -1,11 +1,13 @@
 package com.example.shopapp.model;
 
 
+import com.example.shopapp.response.order.OrderResponse;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -64,4 +66,31 @@ public class Order {
 
     @Column(name = "active")
     private Boolean active;//thuộc về admin
+
+
+    public static OrderResponse fromOrder(Order order) {
+//        List<OrderDetail> orderDetails = order.getO();
+//        List<OrderDetailResponse> orderDetailResponses = orderDetails
+//                .stream()
+//                .map(orderDetail -> OrderDetailResponse.fromOrderDetail(orderDetail)).toList();
+        OrderResponse orderResponse =  OrderResponse
+                .builder()
+                .id(order.getId())
+                .userId(order.getUser().getId())
+                .fullName(order.getFullName())
+                .phoneNumber(order.getPhoneNumber())
+                .email(order.getEmail())
+                .address(order.getAddress())
+                .note(order.getNote())
+                .orderDate(order.getOrderDate())
+                .status(order.getStatus())
+                .totalMoney(order.getTotalMoney())
+                .shippingMethod(order.getShippingMethod())
+                .shippingAddress(order.getShippingAddress())
+                .shippingDate(order.getShippingDate())
+                .paymentMethod(order.getPaymentMethod())
+//                .orderDetails(orderDetailResponses) //important
+                .build();
+        return orderResponse;
+    }
 }

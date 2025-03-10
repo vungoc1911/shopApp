@@ -55,13 +55,80 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order updateOrder(OrderDTO request) {
-        return null;
+    public Order updateOrder(OrderDTO orderDTO) throws Exception {
+        Order order = orderRepository.findById(orderDTO.getId()).orElseThrow(() ->
+                new DataNotFoundException("Cannot find order with id: " ));
+        User existingUser = userRepository.findById(
+                orderDTO.getUserId()).orElseThrow(() ->
+                new DataNotFoundException("Cannot find user with id: " + order.getUser().getId()));
+        /*
+        modelMapper.typeMap(OrderDTO.class, Order.class)
+                .addMappings(mapper -> mapper.skip(Order::setId));
+        modelMapper.map(orderDTO, order);
+         */
+        // Setting user
+        if (orderDTO.getUserId() != null) {
+            User user = new User();
+            user.setId(orderDTO.getUserId());
+            order.setUser(user);
+        }
+
+        if (orderDTO.getFullName() != null && !orderDTO.getFullName().trim().isEmpty()) {
+            order.setFullName(orderDTO.getFullName().trim());
+        }
+
+        if (orderDTO.getEmail() != null && !orderDTO.getEmail().trim().isEmpty()) {
+            order.setEmail(orderDTO.getEmail().trim());
+        }
+
+        if (orderDTO.getPhoneNumber() != null && !orderDTO.getPhoneNumber().trim().isEmpty()) {
+            order.setPhoneNumber(orderDTO.getPhoneNumber().trim());
+        }
+
+        if (orderDTO.getStatus() != null && !orderDTO.getStatus().trim().isEmpty()) {
+            order.setStatus(orderDTO.getStatus().trim());
+        }
+
+        if (orderDTO.getAddress() != null && !orderDTO.getAddress().trim().isEmpty()) {
+            order.setAddress(orderDTO.getAddress().trim());
+        }
+
+        if (orderDTO.getNote() != null && !orderDTO.getNote().trim().isEmpty()) {
+            order.setNote(orderDTO.getNote().trim());
+        }
+
+        if (orderDTO.getTotalMoney() != null) {
+            order.setTotalMoney(orderDTO.getTotalMoney());
+        }
+
+        if (orderDTO.getShippingMethod() != null && !orderDTO.getShippingMethod().trim().isEmpty()) {
+            order.setShippingMethod(orderDTO.getShippingMethod().trim());
+        }
+
+        if (orderDTO.getShippingAddress() != null && !orderDTO.getShippingAddress().trim().isEmpty()) {
+            order.setShippingAddress(orderDTO.getShippingAddress().trim());
+        }
+
+        if (orderDTO.getShippingDate() != null) {
+            order.setShippingDate(orderDTO.getShippingDate());
+        }
+
+        if (orderDTO.getPaymentMethod() != null && !orderDTO.getPaymentMethod().trim().isEmpty()) {
+            order.setPaymentMethod(orderDTO.getPaymentMethod().trim());
+        }
+
+        order.setUser(existingUser);
+        return orderRepository.save(order);
     }
 
     @Override
     public void deleteOrder(Long id) {
-
+        Order order = orderRepository.findById(id).orElse(null);
+        //no hard-delete, => please soft-delete
+        if(order != null) {
+            order.setActive(false);
+            orderRepository.save(order);
+        }
     }
 
 

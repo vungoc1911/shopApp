@@ -12,7 +12,7 @@ public interface IOrderService {
 
     Order getOrder(Long id);
 
-    Order updateOrder(OrderDTO request);
+    Order updateOrder(OrderDTO request) throws Exception;
 
     void deleteOrder(Long id);
 
