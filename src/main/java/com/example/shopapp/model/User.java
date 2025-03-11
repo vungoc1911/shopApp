@@ -2,7 +2,11 @@ package com.example.shopapp.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.*;
 
 @Table(name = "users")
@@ -13,7 +17,7 @@ import java.util.*;
 @AllArgsConstructor
 @Entity
 @Builder
-public class User extends BaseEntity{
+public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,4 +58,17 @@ public class User extends BaseEntity{
     @JoinColumn(name = "role_id")
     private Role role;
 
+    // lấy danh sách quyền
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+        return authorities;
+    }
+
+    // tài khoản đăng nhập
+    @Override
+    public String getUsername() {
+        return phoneNumber;
+    }
 }
