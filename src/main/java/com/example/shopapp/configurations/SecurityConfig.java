@@ -34,7 +34,7 @@ public class SecurityConfig {
     }
 
 
-    // xac thực người dùng
+    // xác thực người dùng
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -43,8 +43,8 @@ public class SecurityConfig {
         return authProvider;
     }
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
-//
-//    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }
