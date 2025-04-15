@@ -31,9 +31,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserLoginDto userDto) {
+    public ResponseEntity<?> login(@Valid @RequestBody UserLoginDto userDto) {
         try {
-            return ResponseEntity.ok("sl;adfksdl;");
+            String token = userService.login(userDto.getPhoneNumber(), userDto.getPassword());
+            return ResponseEntity.ok(token);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

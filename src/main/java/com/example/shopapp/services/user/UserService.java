@@ -1,6 +1,7 @@
 package com.example.shopapp.services.user;
 
 import ch.qos.logback.core.util.StringUtil;
+import com.example.shopapp.compoments.JwtTokenUtils;
 import com.example.shopapp.dto.UserDto;
 import com.example.shopapp.exception.DataNotFoundException;
 import com.example.shopapp.model.Role;
@@ -9,6 +10,9 @@ import com.example.shopapp.repositories.RoleRepository;
 import com.example.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +21,9 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtils jwtTokenUtils;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public User createUser(UserDto userDTO) throws Exception {
@@ -45,15 +52,28 @@ public class UserService implements IUserService {
 
         user.setRole(role);
         if (StringUtils.isBlank(userDTO.getFacebookAccountId()) || StringUtils.isBlank(userDTO.getGoogleAccountId())) {
-            userDTO.getPassword();
+            String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+            user.setPassword(encodedPassword);
         }
         return userRepository.save(user);
     }
 
     @Override
     public String login(String phoneNumber, String password) throws Exception {
-        // đoạn này làm trong security
-        return "";
+        User user = userRepository.findByPhoneNumber(phoneNumber).orElseThrow(
+                () -> new DataNotFoundException("User not found")
+        );
+
+        if (StringUtils.isBlank(user.getFacebookAccountId()) || StringUtils.isBlank(user.getGoogleAccountId())) {
+           if(!passwordEncoder.matches(password, user.getPassword())) {
+               throw new Exception("Wrong password");
+           }
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(phoneNumber, password);
+
+        authenticationManager.authenticate(authenticationToken);
+        return jwtTokenUtils.generateToken(user);
     }
 
 }
