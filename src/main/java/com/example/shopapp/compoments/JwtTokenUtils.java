@@ -10,6 +10,7 @@ import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -84,5 +85,15 @@ public class JwtTokenUtils {
         random.nextBytes(keyBytes);
         String secretKey = Encoders.BASE64.encode(keyBytes);
         return secretKey;
+    }
+
+    public String extractPhoneNumber(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public boolean validateToken(String token, UserDetails user) {
+        String phoneNumber = extractPhoneNumber(token);
+        return (phoneNumber.equals(user.getUsername())
+                && !isTokenExpired(token));
     }
 }
