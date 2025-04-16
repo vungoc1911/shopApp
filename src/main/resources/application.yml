@@ -26,6 +26,7 @@ api:
 
 jwt:
   expiration: 2592000
-  secertKey: abc
+  secretKey: FlR9sLRENDgpOjy85N8Z1r/zB7GuQ0H/IKVTfe3cuzk=
+
 
 

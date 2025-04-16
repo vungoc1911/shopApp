@@ -6,13 +6,16 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.InvalidParameterException;
 import java.security.Key;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,10 +27,11 @@ public class JwtTokenUtils {
     @Value("${jwt.expiration}")
     private int expiration;
 
-    @Value("${jwt.secertKey}")
+    @Value("${jwt.secretKey}")
     private String secretKey;
 
     public String generateToken(User user) {
+//        this.generateSecretKey();
         Map<String, Object> claims = new HashMap<>();
         claims.put("phoneNumber", user.getPhoneNumber());
         try {
@@ -39,7 +43,7 @@ public class JwtTokenUtils {
                     .compact();
             return token;
         } catch (Exception e) {
-            return null;
+            throw new InvalidParameterException(e.getMessage());
         }
     }
 
@@ -72,5 +76,13 @@ public class JwtTokenUtils {
     public boolean isTokenExpired(String token) {
         Date expirationDate = this.extractClaim(token, Claims::getExpiration);
         return expirationDate.before(new Date());
+    }
+
+    private String generateSecretKey() {
+        SecureRandom random = new SecureRandom();
+        byte[] keyBytes = new byte[32];
+        random.nextBytes(keyBytes);
+        String secretKey = Encoders.BASE64.encode(keyBytes);
+        return secretKey;
     }
 }

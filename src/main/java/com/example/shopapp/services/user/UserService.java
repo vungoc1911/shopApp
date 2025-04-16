@@ -51,7 +51,7 @@ public class UserService implements IUserService {
         );
 
         user.setRole(role);
-        if (StringUtils.isBlank(userDTO.getFacebookAccountId()) || StringUtils.isBlank(userDTO.getGoogleAccountId())) {
+        if (userDTO.getFacebookAccountId().equals("0")|| userDTO.getGoogleAccountId().equals("0")) {
             String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
             user.setPassword(encodedPassword);
         }
@@ -64,13 +64,13 @@ public class UserService implements IUserService {
                 () -> new DataNotFoundException("User not found")
         );
 
-        if (StringUtils.isBlank(user.getFacebookAccountId()) || StringUtils.isBlank(user.getGoogleAccountId())) {
+        if (user.getFacebookAccountId().equals("0")|| user.getGoogleAccountId().equals("0")) {
            if(!passwordEncoder.matches(password, user.getPassword())) {
                throw new Exception("Wrong password");
            }
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(phoneNumber, password);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(phoneNumber, password, user.getAuthorities());
 
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtils.generateToken(user);
