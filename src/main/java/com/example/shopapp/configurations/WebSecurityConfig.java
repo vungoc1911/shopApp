@@ -2,6 +2,7 @@ package com.example.shopapp.configurations;
 
 import com.example.shopapp.compoments.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+    @Value("${api.prefix}")
+    private String apiPrefix;
 
     private final JwtTokenFilter jwtTokenFilter;
 
@@ -23,8 +26,14 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> {
-                    requests.requestMatchers("**").permitAll();
+                    requests.requestMatchers(String.format("/api/v1/users/login")).permitAll()
+                            .requestMatchers(adminEndpoints()).hasRole("ADMIN")
+                            .requestMatchers(String.format("/api/v1/products/**")).hasRole("USER");
                 });
         return http.build();
+    }
+
+    private String[] adminEndpoints() {
+        return new String[] { "/api/v1/categories"};
     }
 }
