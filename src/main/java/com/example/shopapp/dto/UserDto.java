@@ -21,7 +21,6 @@ public class UserDto  {
     private String email;
     @NotBlank(message = "password is required")
     private String password;
-    private Date DateOfBirth;
     private String facebookAccountId;
     private String googleAccountId;
     private Long roleId;

@@ -3,6 +3,7 @@ package com.example.shopapp.services.user;
 import ch.qos.logback.core.util.StringUtil;
 import com.example.shopapp.compoments.JwtTokenUtils;
 import com.example.shopapp.dto.UserDto;
+import com.example.shopapp.exception.BadRequestException;
 import com.example.shopapp.exception.DataNotFoundException;
 import com.example.shopapp.model.Role;
 import com.example.shopapp.model.User;
@@ -10,6 +11,7 @@ import com.example.shopapp.repositories.RoleRepository;
 import com.example.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +26,9 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtils;
     private final AuthenticationManager authenticationManager;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private final String DEFAULT_KEY_VALUE = "user";
 
     @Override
     public User createUser(UserDto userDTO) throws Exception {
@@ -32,7 +37,7 @@ public class UserService implements IUserService {
             throw new Exception("Phone number already in use");
         }
         if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new Exception("Email already in use");
+            throw new BadRequestException("Email already in use");
         }
         User user = User.builder()
                 .fullName(userDTO.getFullName())
@@ -40,7 +45,6 @@ public class UserService implements IUserService {
                 .email(userDTO.getEmail())
                 .password(userDTO.getPassword())
                 .address(userDTO.getAddress())
-                .dateOfBirth(userDTO.getDateOfBirth())
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
                 .active(true)
@@ -55,7 +59,9 @@ public class UserService implements IUserService {
             String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
             user.setPassword(encodedPassword);
         }
-        return userRepository.save(user);
+        userRepository.save(user);
+        redisTemplate.opsForValue().set(DEFAULT_KEY_VALUE + user.getId(), user);
+        return user;
     }
 
     @Override

@@ -26,7 +26,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> {
-                    requests.requestMatchers(String.format("/api/v1/users/login")).permitAll()
+                    requests.requestMatchers(publicEndpoints()).permitAll()
                             .requestMatchers(adminEndpoints()).hasRole("ADMIN")
                             .requestMatchers(String.format("/api/v1/products/**")).hasRole("USER");
                 });
@@ -35,5 +35,11 @@ public class WebSecurityConfig {
 
     private String[] adminEndpoints() {
         return new String[] { "/api/v1/categories"};
+    }
+
+    private String[] publicEndpoints() {
+        return new String[] {
+                "/api/v1/users/login",
+                "/api/v1/users/register"};
     }
 }

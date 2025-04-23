@@ -1,5 +1,6 @@
 package com.example.shopapp.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +18,7 @@ import java.util.*;
 @AllArgsConstructor
 @Entity
 @Builder
-public class User extends BaseEntity implements UserDetails {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,9 +45,6 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(name = "is_active")
     private boolean active;
-
-    @Column(name = "date_of_birth")
-    private Date dateOfBirth;
 
     @Column(name = "facebook_account_id")
     private String facebookAccountId;
