@@ -8,4 +8,6 @@ public interface IUserService {
     User createUser(UserDto userDTO) throws Exception;
 
     String login(String phoneNumber, String password) throws Exception;
+
+    User updateUser(UserDto userDTO) throws Exception;
 }

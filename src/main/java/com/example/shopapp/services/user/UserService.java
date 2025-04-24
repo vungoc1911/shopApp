@@ -28,7 +28,7 @@ public class UserService implements IUserService {
     private final AuthenticationManager authenticationManager;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    private final String DEFAULT_KEY_VALUE = "user";
+    private final String DEFAULT_KEY_VALUE = "user:";
 
     @Override
     public User createUser(UserDto userDTO) throws Exception {
@@ -81,5 +81,40 @@ public class UserService implements IUserService {
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtils.generateToken(user);
     }
+
+    @Override
+    public User updateUser(UserDto userDTO) throws Exception {
+        User userUpdate = userRepository.findByPhoneNumber(userDTO.getPhoneNumber())
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+
+// Cập nhật từng trường
+        userUpdate.setFullName(userDTO.getFullName());
+        userUpdate.setEmail(userDTO.getEmail());
+        userUpdate.setPassword(userDTO.getPassword());
+        userUpdate.setAddress(userDTO.getAddress());
+        userUpdate.setFacebookAccountId(userDTO.getFacebookAccountId());
+        userUpdate.setGoogleAccountId(userDTO.getGoogleAccountId());
+        userUpdate.setActive(true);
+
+// Lưu vào DB
+        userRepository.save(userUpdate);
+
+// Lưu lại vào Redis cache
+        redisTemplate.opsForValue().set("user:" + userUpdate.getId(), userUpdate);
+
+
+        Role role = roleRepository.findById(userDTO.getRoleId()).orElseThrow(
+                () -> new DataNotFoundException("Role not found")
+        );
+        userUpdate.setRole(role);
+        if (userDTO.getFacebookAccountId().equals("0")|| userDTO.getGoogleAccountId().equals("0")) {
+            String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+            userUpdate.setPassword(encodedPassword);
+        }
+        userRepository.save(userUpdate);
+        redisTemplate.opsForValue().set(DEFAULT_KEY_VALUE + userUpdate.getId(), userUpdate);
+        return userUpdate;
+    }
+
 
 }

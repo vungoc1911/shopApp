@@ -34,7 +34,9 @@ public class WebSecurityConfig {
     }
 
     private String[] adminEndpoints() {
-        return new String[] { "/api/v1/categories"};
+        return new String[] {
+                "/api/v1/categories",
+                "/api/v1/users/update"};
     }
 
     private String[] publicEndpoints() {

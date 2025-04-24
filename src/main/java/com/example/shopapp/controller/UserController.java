@@ -40,4 +40,14 @@ public class UserController {
         }
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<ResponseObject> updateUser(@Valid @RequestBody UserDto userDto) throws Exception {
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .data(userService.updateUser(userDto))
+                .message("Account registration successful")
+                .build());
+
+    }
+
 }
