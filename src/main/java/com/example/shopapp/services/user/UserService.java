@@ -10,6 +10,7 @@ import com.example.shopapp.model.User;
 import com.example.shopapp.repositories.RoleRepository;
 import com.example.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -116,5 +117,26 @@ public class UserService implements IUserService {
         return userUpdate;
     }
 
+    @Override
+    public User deleteUser(Long id) throws Exception {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new DataNotFoundException("User not found")
+        );
+        userRepository.delete(user);
+        redisTemplate.delete(DEFAULT_KEY_VALUE + user.getId());
+        return user;
+    }
 
+    @Override
+    public User filterUser(Long id) throws Exception {
+        User userCache = (User) redisTemplate.opsForValue().get(DEFAULT_KEY_VALUE + id);
+        if (!ObjectUtils.isEmpty(userCache)) {
+            return userCache;
+        }
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new DataNotFoundException("User not found")
+        );
+        redisTemplate.opsForValue().set(DEFAULT_KEY_VALUE + id, user);
+        return user;
+    }
 }

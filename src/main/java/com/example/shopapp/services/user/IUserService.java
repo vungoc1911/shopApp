@@ -10,4 +10,8 @@ public interface IUserService {
     String login(String phoneNumber, String password) throws Exception;
 
     User updateUser(UserDto userDTO) throws Exception;
+
+    User deleteUser(Long id) throws Exception;
+
+    User filterUser(Long id) throws Exception;
 }

@@ -8,10 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/users")
@@ -50,4 +47,23 @@ public class UserController {
 
     }
 
+    @PostMapping("/delete")
+    public ResponseEntity<ResponseObject> updateUser(@RequestParam("id") Long id) throws Exception {
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .data(userService.deleteUser(id))
+                .message("Delete Account successful")
+                .build());
+
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<ResponseObject> filter(@RequestParam("id") Long id) throws Exception {
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.OK)
+                .data(userService.filterUser(id))
+                .message("Delete Account successful")
+                .build());
+
+    }
 }
