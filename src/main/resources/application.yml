@@ -13,7 +13,6 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        bytecode:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
   servlet:
@@ -24,6 +23,14 @@ spring:
     redis:
       host: localhost
       port: 6379
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 api:
   prefix: /api/v1
@@ -31,6 +38,3 @@ api:
 jwt:
   expiration: 2592000
   secretKey: FlR9sLRENDgpOjy85N8Z1r/zB7GuQ0H/IKVTfe3cuzk=
-
-
-
