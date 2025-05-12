@@ -1,9 +1,11 @@
 package com.example.shopapp.controller;
 
+import com.example.shopapp.configurations.KafkaProducerConfig;
 import com.example.shopapp.dto.UserDto;
 import com.example.shopapp.dto.UserLoginDto;
 import com.example.shopapp.response.ResponseObject;
 import com.example.shopapp.services.user.UserService;
+import com.google.gson.Gson;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final Gson gson;
+    private final KafkaProducerConfig kafkaProducerConfig;
 
     @PostMapping("/register")
     public ResponseEntity<ResponseObject> createUser(@Valid @RequestBody UserDto userDto) throws Exception {
@@ -65,5 +69,12 @@ public class UserController {
                 .message("Delete Account successful")
                 .build());
 
+    }
+
+    @PostMapping("/send")
+    public ResponseEntity<?> send(@RequestBody UserDto userDto) throws Exception {
+        String json = gson.toJson(userDto);
+        kafkaProducerConfig.sendMessage(userDto.getPhoneNumber(), json);
+        return ResponseEntity.ok("send ok");
     }
 }

@@ -9,10 +9,12 @@ import com.example.shopapp.model.Role;
 import com.example.shopapp.model.User;
 import com.example.shopapp.repositories.RoleRepository;
 import com.example.shopapp.repositories.UserRepository;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +32,7 @@ public class UserService implements IUserService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final String DEFAULT_KEY_VALUE = "user:";
+    private final Gson gson;
 
     @Override
     public User createUser(UserDto userDTO) throws Exception {
@@ -138,5 +141,15 @@ public class UserService implements IUserService {
         );
         redisTemplate.opsForValue().set(DEFAULT_KEY_VALUE + id, user);
         return user;
+    }
+
+    @KafkaListener(topics = "user_topic", groupId = "my-group")
+    public void listen(String messsage) throws Exception {
+        try {
+            UserDto user = gson.fromJson(messsage, UserDto.class);
+            createUser(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
